@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreshScan AI | Food Freshness Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+        }
+        .gradient-border {
+            position: relative;
+            border-radius: 1rem;
+        }
+        .gradient-border::before {
+            content: "";
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ff5e62, #ff9966);
+            z-index: -1;
+            border-radius: 1.1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .gradient-border:hover::before {
+            opacity: 1;
+        }
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+        .pulse-button {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .custom-file-input {
+            cursor: pointer;
+            position: relative;
+        }
+        .loader {
+            border-top-color: #ef4444;
+            animation: spinner 0.6s linear infinite;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ef4444',
+                        secondary: '#f97316',
+                        accent: '#fbbf24'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gradient-to-br from-orange-50 via-red-50 to-yellow-50 min-h-screen text-gray-800">
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
+        <div class="bg-white p-8 rounded-xl shadow-2xl">
+            <div class="flex items-center space-x-4">
+                <div class="border-4 border-gray-200 border-t-primary rounded-full w-12 h-12 loader"></div>
+                <div>
+                    <h3 class="text-lg font-medium">Analyzing your image</h3>
+                    <p class="text-gray-500">This will take just a moment...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container max-w-6xl mx-auto p-6 pt-10">
+        <!-- App Header -->
+        <header class="text-center mb-16">
+            <div class="relative inline-block mb-6">
+                <i class="fas fa-apple-alt text-6xl text-primary animate-float"></i>
+                <div class="absolute -top-2 -right-2 bg-yellow-400 rounded-full h-6 w-6 flex items-center justify-center shadow-lg">
+                    <i class="fas fa-check text-white text-xs"></i>
+                </div>
+            </div>
+            <h1 class="text-6xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+                FreshScan AI
+            </h1>
+            <p class="text-gray-600 text-xl max-w-2xl mx-auto leading-relaxed">
+                Instantly determine if your fruits and vegetables are fresh or spoiled with our advanced AI detection technology.
+            </p>
+            <div class="flex items-center justify-center mt-6 space-x-4">
+                <span class="flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                    <i class="fas fa-bolt mr-1"></i> Fast Results
+                </span>
+                <span class="flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                    <i class="fas fa-shield-alt mr-1"></i> 97% Accurate
+                </span>
+                <span class="flex items-center px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
+                    <i class="fas fa-camera mr-1"></i> Camera Ready
+                </span>
+            </div>
+        </header>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Steps Panel -->
+            <div class="md:col-span-1">
+                <div class="bg-white rounded-2xl shadow-xl p-6 card-hover">
+                    <h2 class="text-2xl font-semibold mb-6 flex items-center text-gray-800">
+                        <i class="fas fa-list-ol mr-3 text-primary"></i>
+                        How It Works
+                    </h2>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1">
+                                1
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="font-medium text-lg">Take or Upload Photo</h3>
+                                <p class="text-gray-600 text-sm">Use your webcam or upload an existing photo of your food.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="bg-secondary text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1">
+                                2
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="font-medium text-lg">AI Analysis</h3>
+                                <p class="text-gray-600 text-sm">Our advanced neural network analyzes the image in seconds.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="bg-accent text-white rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0 mt-1">
+                                3
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="font-medium text-lg">Get Results</h3>
+                                <p class="text-gray-600 text-sm">See if your food is fresh or spoiled with confidence score.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 p-4 bg-orange-50 rounded-xl border border-orange-100">
+                        <div class="flex items-start">
+                            <i class="fas fa-lightbulb text-orange-500 mt-1"></i>
+                            <p class="ml-3 text-sm text-gray-700">
+                                <span class="font-medium block mb-1">Pro Tip:</span>
+                                Ensure good lighting and a clear view of the food for the most accurate results.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="md:col-span-2">
+                <!-- Upload Section -->
+                <div class="bg-white rounded-2xl shadow-xl p-8 mb-8 gradient-border">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-camera-retro mr-3 text-primary"></i>
+                        Analyze Your Food
+                    </h2>
+                    
+                    <form method="post" enctype="multipart/form-data" id="upload-form" onsubmit="showLoading()">
+                        {% csrf_token %}
+                        <div class="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center hover:border-primary transition-colors bg-gray-50">
+                            <div class="mb-6">
+                                <img id="preview-image" class="hidden mx-auto max-h-64 rounded-lg shadow-lg mb-4" />
+                                <video id="webcam" autoplay playsinline class="hidden w-full max-w-md mx-auto rounded-lg mb-4 shadow-lg"></video>
+                                <canvas id="canvas" class="hidden"></canvas>
+                                <img id="captured-image" class="hidden max-h-64 mx-auto rounded-lg shadow-lg mb-4" />
+                            </div>
+                            
+                            <div class="mb-6 relative custom-file-input">
+                                <input type="file" name="uploaded_file" id="file-input" required
+                                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    onchange="previewImage(this)" accept="image/*">
+                                <div id="file-name" class="flex flex-col items-center justify-center h-24 border-2 border-gray-300 border-dashed rounded-lg p-6 cursor-pointer hover:bg-gray-100 transition-all">
+                                    <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i>
+                                    <span class="text-gray-500">Drag and drop your image or click to browse</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex flex-col md:flex-row items-center justify-center gap-4">
+                                <button type="button" onclick="startWebcam()"
+                                    class="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 flex items-center w-full md:w-auto justify-center">
+                                    <i class="fas fa-video mr-2"></i>
+                                    Use Webcam
+                                </button>
+                                
+                                <button type="button" onclick="captureImage()"
+                                    class="hidden bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105 flex items-center w-full md:w-auto justify-center" id="capture-btn">
+                                    <i class="fas fa-camera mr-2"></i>
+                                    Take Photo
+                                </button>
+                                
+                                <button type="submit"
+                                    class="bg-gradient-to-r from-primary to-secondary text-white px-6 py-3 rounded-lg shadow-lg hover:from-red-600 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 flex items-center w-full md:w-auto justify-center pulse-button">
+                                    <i class="fas fa-search mr-2"></i>
+                                    Analyze Now
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Results Section -->
+                <div class="bg-white rounded-2xl shadow-xl p-8 mb-8">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                        <i class="fas fa-chart-pie mr-3 text-primary"></i>
+                        Analysis Results
+                    </h2>
+                    
+                    {% if result %}
+                    <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-xl p-6 border border-blue-100 shadow-inner">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <div class="md:w-7/12">
+                                <div class="space-y-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-500 text-sm uppercase tracking-wider mb-1">Food Type</span>
+                                        <span class="font-medium text-xl">
+                                            {% with parts=result.prediction|split:"_" %}
+                                            {{ parts.0 }}
+                                            {% endwith %}
+                                        </span>
+                                    </div>
+                                    
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-500 text-sm uppercase tracking-wider mb-1">Condition</span>
+                                        <div class="flex items-center">
+                                            {% if "Healthy" in result.prediction %}
+                                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                                                <i class="fas fa-check-circle mr-1"></i> Healthy
+                                            </span>
+                                            {% else %}
+                                            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">
+                                                <i class="fas fa-times-circle mr-1"></i> Spoiled
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-500 text-sm uppercase tracking-wider mb-1">Confidence Score</span>
+                                        <div class="w-full bg-gray-200 rounded-full h-4">
+                                            <div class="{% if result.confidence > 90 %}bg-green-500{% elif result.confidence > 70 %}bg-yellow-500{% else %}bg-red-500{% endif %} h-4 rounded-full" style="width: {{ result.confidence }}%"></div>
+                                        </div>
+                                        <span class="mt-1 text-sm">{{ result.confidence }}% confident</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="md:w-5/12 bg-white rounded-lg p-5 shadow-sm flex flex-col items-center justify-center border border-gray-100">
+                                {% if "Healthy" in result.prediction %}
+                                <i class="fas fa-check-circle text-5xl text-green-500 mb-3"></i>
+                                <h3 class="text-xl font-medium text-gray-800 mb-1">Good to Eat!</h3>
+                                <p class="text-gray-600 text-center text-sm">This food appears to be fresh and safe for consumption.</p>
+                                {% else %}
+                                <i class="fas fa-exclamation-triangle text-5xl text-red-500 mb-3"></i>
+                                <h3 class="text-xl font-medium text-gray-800 mb-1">Not Recommended!</h3>
+                                <p class="text-gray-600 text-center text-sm">This food appears to be spoiled and should not be consumed.</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% elif error %}
+                    <div class="bg-red-50 rounded-xl p-6 border border-red-200">
+                        <div class="flex items-center">
+                            <i class="fas fa-exclamation-circle text-3xl text-red-500 mr-4"></i>
+                            <div>
+                                <h3 class="text-lg font-medium text-red-800 mb-1">Analysis Error</h3>
+                                <p class="text-red-700">{{ error }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="bg-gray-50 rounded-xl p-8 text-center border border-gray-100">
+                        <div class="text-gray-300 mb-3">
+                            <i class="fas fa-microscope text-6xl"></i>
+                        </div>
+                        <h3 class="text-xl font-medium text-gray-400 mb-2">No Results Yet</h3>
+                        <p class="text-gray-500">Upload or capture an image to begin your food analysis</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 py-8 border-t border-gray-200">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h3 class="text-lg font-semibold text-primary flex items-center">
+                        <i class="fas fa-apple-alt mr-2"></i> FreshScan AI
+                    </h3>
+                    <p class="text-gray-500 text-sm">Powered by Advanced Deep Learning Technology</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#" class="text-gray-500 hover:text-primary transition-colors">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function previewImage(input) {
+            const preview = document.getElementById('preview-image');
+            const fileName = document.getElementById('file-name');
+            const file = input.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    fileName.innerHTML = `<span class="text-primary font-medium">${file.name}</span>`;
+                }
+                reader.readAsDataURL(file);
+                
+                // Reset webcam if active
+                const video = document.getElementById('webcam');
+                const capturedImage = document.getElementById('captured-image');
+                
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                    video.classList.add('hidden');
+                    document.getElementById('capture-btn').classList.add('hidden');
+                }
+                
+                capturedImage.classList.add('hidden');
+            }
+        }
+
+        function updateFileName(input) {
+            const fileName = input.files[0]?.name;
+            document.getElementById('file-name').innerHTML = fileName ? 
+                `<span class="text-primary font-medium">${fileName}</span>` : 
+                '<i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i><span class="text-gray-500">Drag and drop your image or click to browse</span>';
+        }
+
+        function startWebcam() {
+            const video = document.getElementById('webcam');
+            const captureBtn = document.getElementById('capture-btn');
+            const fileInput = document.getElementById('file-input');
+            const fileName = document.getElementById('file-name');
+            const previewImage = document.getElementById('preview-image');
+            
+            // Hide preview if visible
+            previewImage.classList.add('hidden');
+            
+            // Hide file input elements and show webcam elements
+            fileInput.disabled = true;
+            fileName.innerHTML = '<span class="text-blue-500 font-medium">Camera activated</span>';
+            
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                    video.classList.remove('hidden');
+                    captureBtn.classList.remove('hidden');
+                })
+                .catch(err => {
+                    console.error('Error accessing webcam:', err);
+                    showNotification('Cannot access webcam. Please check permissions.', 'error');
+                    fileInput.disabled = false;
+                    fileName.innerHTML = '<i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i><span class="text-gray-500">Drag and drop your image or click to browse</span>';
+                });
+        }
+
+        function captureImage() {
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('canvas');
+            const capturedImage = document.getElementById('captured-image');
+            
+            // Set canvas dimensions to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw the current video frame to the canvas
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert canvas to blob
+            canvas.toBlob(blob => {
+                // Create a File object from the blob
+                const imageFile = new File([blob], "captured-image.png", { type: "image/png" });
+                
+                // Create a FileList-like object
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(imageFile);
+                
+                // Set the file input's files property to our FileList-like object
+                document.getElementById('file-input').files = dataTransfer.files;
+                
+                // Show the captured image
+                capturedImage.src = URL.createObjectURL(blob);
+                capturedImage.classList.remove('hidden');
+                
+                // Stop the webcam stream
+                if (video.srcObject) {
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                }
+                
+                // Hide webcam and capture button
+                video.classList.add('hidden');
+                document.getElementById('capture-btn').classList.add('hidden');
+                
+                // Update the file name display
+                document.getElementById('file-name').innerHTML = '<span class="text-green-500 font-medium">Photo captured! Ready for analysis</span>';
+                
+                // Enable the file input again
+                document.getElementById('file-input').disabled = false;
+                
+                showNotification('Photo captured successfully!', 'success');
+            }, "image/png");
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white flex items-center transition-all transform translate-y-20 opacity-0 z-50 ${type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-500' : 'bg-blue-500'}`;
+            
+            // Add icon based on type
+            const icon = document.createElement('i');
+            icon.className = `fas ${type === 'error' ? 'fa-exclamation-circle' : type === 'success' ? 'fa-check-circle' : 'fa-info-circle'} mr-2`;
+            notification.appendChild(icon);
+            
+            // Add message
+            const text = document.createElement('span');
+            text.textContent = message;
+            notification.appendChild(text);
+            
+            // Add to document
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.classList.replace('translate-y-20', 'translate-y-0');
+                notification.classList.replace('opacity-0', 'opacity-100');
+            }, 10);
+            
+            // Animate out after timeout
+            setTimeout(() => {
+                notification.classList.replace('translate-y-0', 'translate-y-20');
+                notification.classList.replace('opacity-100', 'opacity-0');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }, 3000);
+        }
+        
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+        }
+        
+        // Additional helper for the Django template to split strings
+        {% if result %}
+        // Not needed in JavaScript, just used for Django template
+        {% endif %}
+    </script>
+</body>
+</html>
