@@ -4,6 +4,7 @@ from django.template.defaulttags import register
 import torch
 import torch.nn as nn
 from torchvision import transforms, models
+from torchvision.models import ResNet18_Weights  # Import the weights class
 from PIL import Image
 import numpy as np
 import os
@@ -20,14 +21,14 @@ def split(value, key):
 class ResNet18(nn.Module):
     def __init__(self, num_classes):
         super(ResNet18, self).__init__()
-        self.model = models.resnet18(pretrained=True)  # Pre-trained ResNet18 model
+        self.model = models.resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)  # Use IMAGENET1K_V1 weights
         self.model.fc = nn.Linear(self.model.fc.in_features, num_classes)  # Adjust output layer for our task
 
     def forward(self, x):
         return self.model(x)
 
-# Initialize the model and load the trained weights
-model = models.resnet18(pretrained=True)
+# Global model initialization (to avoid reloading on every request)
+model = models.resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)  # Load pre-trained weights using IMAGENET1K_V1
 model.fc = nn.Linear(model.fc.in_features, 28)  # Adjust output layer for your task
 
 # Load the model weights on the CPU
