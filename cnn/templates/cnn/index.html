@@ -211,7 +211,7 @@
                                 <button type="button" onclick="startWebcam()"
                                     class="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-6 py-3 rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 flex items-center w-full md:w-auto justify-center">
                                     <i class="fas fa-video mr-2"></i>
-                                    Use Webcam
+                                    Use Rear Camera
                                 </button>
                                 
                                 <button type="button" onclick="captureImage()"
@@ -385,17 +385,37 @@
             fileInput.disabled = true;
             fileName.innerHTML = '<span class="text-blue-500 font-medium">Camera activated</span>';
             
-            navigator.mediaDevices.getUserMedia({ video: true })
+            // Request specifically the rear/environment-facing camera
+            const constraints = {
+                video: {
+                    facingMode: { exact: "environment" } // This requests the rear camera
+                }
+            };
+            
+            navigator.mediaDevices.getUserMedia(constraints)
                 .then(stream => {
                     video.srcObject = stream;
                     video.classList.remove('hidden');
                     captureBtn.classList.remove('hidden');
+                    showNotification('Rear camera activated', 'success');
                 })
                 .catch(err => {
-                    console.error('Error accessing webcam:', err);
-                    showNotification('Cannot access webcam. Please check permissions.', 'error');
-                    fileInput.disabled = false;
-                    fileName.innerHTML = '<i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i><span class="text-gray-500">Drag and drop your image or click to browse</span>';
+                    console.error('Error accessing rear camera:', err);
+                    
+                    // Fallback to any available camera if rear camera isn't available
+                    showNotification('Rear camera not available, trying default camera...', 'info');
+                    navigator.mediaDevices.getUserMedia({ video: true })
+                        .then(stream => {
+                            video.srcObject = stream;
+                            video.classList.remove('hidden');
+                            captureBtn.classList.remove('hidden');
+                        })
+                        .catch(fallbackErr => {
+                            console.error('Error accessing webcam:', fallbackErr);
+                            showNotification('Cannot access any camera. Please check permissions.', 'error');
+                            fileInput.disabled = false;
+                            fileName.innerHTML = '<i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-2"></i><span class="text-gray-500">Drag and drop your image or click to browse</span>';
+                        });
                 });
         }
 
